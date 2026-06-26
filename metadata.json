@@ -1,6 +1,6 @@
 {
-  "name": "Quản lý Nhóm Media",
-  "description": "Hệ thống quản lý công việc, tiến độ, KPI và đề xuất bảng lương cho 8 thành viên của Nhóm Media.",
+  "name": "Quản lý Công việc Team Marketing",
+  "description": "Hệ thống quản lý công việc, tiến độ, KPI và đề xuất bảng lương cho các thành viên của Team Marketing.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

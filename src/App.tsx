@@ -37,6 +37,10 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [hasApiKey, setHasApiKey] = useState<boolean>(true);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState<boolean>(false);
+  const [showStatsOnMobile, setShowStatsOnMobile] = useState<boolean>(false);
+
+  const isFullAccess = currentUser?.id === 'an' || currentUser?.id === 'thinh';
+  const displayPersonnelList = personnelList.filter(p => p.id !== 'thinh');
 
   // Initialize data from localStorage or default static dataset
   useEffect(() => {
@@ -85,9 +89,7 @@ export default function App() {
           const found = merged.find(p => p.id === savedUserId);
           if (found) {
             setCurrentUser(found);
-            if (found.id !== 'an') {
-              setSelectedMemberId(found.id);
-            }
+            setSelectedMemberId(found.id === 'thinh' ? 'an' : found.id);
           }
         }
       } catch (e) {
@@ -102,9 +104,7 @@ export default function App() {
         const found = initialPersonnelData.find(p => p.id === savedUserId);
         if (found) {
           setCurrentUser(found);
-          if (found.id !== 'an') {
-            setSelectedMemberId(found.id);
-          }
+          setSelectedMemberId(found.id === 'thinh' ? 'an' : found.id);
         }
       }
     }
@@ -218,15 +218,15 @@ export default function App() {
   };
 
   // Find currently selected member object
-  const selectedMember = personnelList.find(p => p.id === selectedMemberId) || personnelList[0];
+  const selectedMember = displayPersonnelList.find(p => p.id === selectedMemberId) || displayPersonnelList[0];
 
   // CALCULATE AGGREGATE STATS FOR EXECUTIVE PANEL
   
   // 1. Total team size
-  const totalStaff = personnelList.length;
+  const totalStaff = displayPersonnelList.length;
 
   // 2. Cumulative daily tasks completion rate
-  const allDailyTasks = personnelList.flatMap(p => p.tasks);
+  const allDailyTasks = displayPersonnelList.flatMap(p => p.tasks);
   const completedDailyTasks = allDailyTasks.filter(t => t.completed).length;
   const totalDailyTasksCount = allDailyTasks.length;
   const teamDailyProgress = totalDailyTasksCount > 0 
@@ -242,13 +242,13 @@ export default function App() {
     return Math.min(Math.max((kpi.currentValue / kpi.targetValue) * 100, 0), 150);
   };
 
-  const allKPIs = personnelList.flatMap(p => p.kpis);
+  const allKPIs = displayPersonnelList.flatMap(p => p.kpis);
   const averageKPIIndex = allKPIs.length > 0
     ? Math.round(allKPIs.reduce((sum, k) => sum + calculateKPICompletion(k), 0) / allKPIs.length)
     : 0;
 
   // 4. Cumulative simulated total salary budget
-  const totalSalaryBudget = personnelList.reduce((sum, person) => {
+  const totalSalaryBudget = displayPersonnelList.reduce((sum, person) => {
     const baseAvg = (person.baseSalaryMin + person.baseSalaryMax) / 2;
     const maxBonus = person.estimatedTotalMax - person.baseSalaryMax;
     
@@ -291,7 +291,9 @@ export default function App() {
         onLoginSuccess={(user) => {
           setCurrentUser(user);
           localStorage.setItem('media_group_logged_in_user_id', user.id);
-          if (user.id !== 'an') {
+          if (user.id === 'thinh') {
+            setSelectedMemberId('an');
+          } else if (user.id !== 'an') {
             setSelectedMemberId(user.id);
           } else {
             setSelectedMemberId('an');
@@ -302,59 +304,71 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-blue-500/20 selection:text-blue-800 pb-12">
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-blue-500/20 selection:text-blue-800 pb-24 sm:pb-12">
       {/* Upper Brand Header */}
       <header className="border-b border-slate-200 bg-white sticky top-0 z-40 backdrop-blur-md shadow-xs">
-        <div className="max-w-[1700px] 2xl:max-w-[1850px] w-full mx-auto px-4 sm:px-6 lg:px-12 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="max-w-[1700px] 2xl:max-w-[1850px] w-full mx-auto px-3 sm:px-6 lg:px-12 py-3 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-500/10">
-              <Video className="h-5.5 w-5.5 text-white stroke-[2.5]" />
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-200/80 shadow-xs shrink-0 overflow-hidden">
+              <img 
+                src="https://mkt.fugalo.vn/logo-stamp.png" 
+                alt="Fugalo Stamp" 
+                className="h-full w-full object-contain p-1.5 transition-transform hover:rotate-12 duration-300"
+                referrerPolicy="no-referrer"
+              />
             </div>
-            <div>
-              <h1 className="text-lg font-bold tracking-tight text-blue-600 uppercase flex items-center gap-2">
-                Hệ thống Quản lý Nhóm Media
+            <div className="text-center sm:text-left">
+              <h1 className="text-sm sm:text-lg font-black tracking-tight bg-gradient-to-r from-red-800 via-amber-700 to-amber-950 bg-clip-text text-transparent uppercase">
+                Hệ thống Quản lý Công việc Team Marketing
               </h1>
-              <p className="text-xs text-slate-500 font-medium">
-                Ban chỉ huy, điều phối & Đánh giá hiệu suất {personnelList.length} nhân sự chính (Fugalo & Anh Long)
+              <p className="text-[9px] sm:text-xs text-slate-500 font-medium line-clamp-1">
+                Fugalo & Anh Long • Ban chỉ huy & Hiệu suất {personnelList.length} nhân sự
               </p>
             </div>
           </div>
 
           {/* Action buttons */}
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto border-t sm:border-t-0 pt-2.5 sm:pt-0 border-slate-100">
             {/* User Session Info Badge */}
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg">
+            <div className="flex items-center gap-2 px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg">
               <img 
                 src={currentUser.avatar} 
                 alt={currentUser.name} 
-                className="w-5.5 h-5.5 rounded-full object-cover border border-slate-200 shadow-xs"
+                className="w-5 h-5 rounded-full object-cover border border-slate-200 shadow-xs"
               />
               <div className="text-left">
-                <span className="text-[11px] font-bold text-slate-800 block line-clamp-1">{currentUser.name}</span>
-                <span className="text-[9px] text-slate-500 font-medium block leading-none">{currentUser.id === 'an' ? 'TP.MKT & Tech Lead' : 'Nhân sự Media'}</span>
+                <span className="text-[10px] font-bold text-slate-800 block max-w-[80px] sm:max-w-[120px] truncate">{currentUser.name}</span>
+                <span className="text-[8px] text-slate-500 font-medium block leading-none">
+                  {currentUser.id === 'an' 
+                    ? 'TP.MKT & Tech Lead' 
+                    : (currentUser.role || 'Nhân sự Media')
+                  }
+                </span>
               </div>
             </div>
 
-            <button
-              onClick={() => setShowLogoutConfirm(true)}
-              className="p-2 rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 transition cursor-pointer flex items-center gap-1 text-xs font-semibold"
-              title="Đăng xuất"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Đăng xuất</span>
-            </button>
+            <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
+              {currentUser.id === 'an' && (
+                <button
+                  onClick={handleResetDailyTasks}
+                  className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-[10px] sm:text-xs font-bold text-slate-600 hover:text-slate-800 transition cursor-pointer"
+                >
+                  Reset
+                </button>
+              )}
 
-            {currentUser.id === 'an' && (
               <button
-                onClick={handleResetDailyTasks}
-                className="px-3.5 py-2 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-600 hover:text-slate-800 transition cursor-pointer"
+                onClick={() => setShowLogoutConfirm(true)}
+                className="p-1.5 sm:p-2 rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 transition cursor-pointer flex items-center gap-1 text-[10px] sm:text-xs font-semibold"
+                title="Đăng xuất"
               >
-                Reset nhiệm vụ ngày
+                <LogOut className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Đăng xuất</span>
               </button>
-            )}
+            </div>
 
             {!hasApiKey && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-xs font-medium">
+              <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-xs font-medium">
                 <AlertCircle className="h-4 w-4" />
                 <span>Chưa cấu hình API Key</span>
               </div>
@@ -363,10 +377,26 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-[1700px] 2xl:max-w-[1850px] w-full mx-auto px-4 sm:px-6 lg:px-12 py-6 space-y-6">
+      <main className="max-w-[1700px] 2xl:max-w-[1850px] w-full mx-auto px-3 sm:px-6 lg:px-12 py-4 sm:py-6 space-y-4 sm:space-y-6">
         {/* Executive High-Level Analytics Panel */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {currentUser.id === 'an' ? (
+        <div className="space-y-3">
+          {isFullAccess && (
+            <div className="sm:hidden flex items-center justify-between bg-white px-3.5 py-2.5 rounded-xl border border-slate-200 shadow-xs">
+              <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                <TrendingUp className="h-4 w-4 text-blue-600 animate-pulse" />
+                Thống kê hệ thống & Quỹ lương
+              </span>
+              <button
+                onClick={() => setShowStatsOnMobile(!showStatsOnMobile)}
+                className="text-[11px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200/60 px-2 py-1 rounded-lg transition cursor-pointer"
+              >
+                {showStatsOnMobile ? "Ẩn chỉ số ▲" : "Xem chỉ số ▼"}
+              </button>
+            </div>
+          )}
+
+          <div className={`${isFullAccess ? (showStatsOnMobile ? 'grid animate-in fade-in slide-in-from-top-2 duration-200' : 'hidden sm:grid') : 'grid'} grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4`}>
+          {isFullAccess ? (
             <>
               {/* Card 1: Team Size */}
               <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between">
@@ -374,7 +404,7 @@ export default function App() {
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tổng nhân sự</span>
                   <div className="text-2xl font-mono font-bold text-slate-800">{totalStaff} nhân sự</div>
                   <p className="text-[10px] text-slate-500">
-                    {personnelList.filter(p => p.id === 'an').length} Manager + {personnelList.filter(p => p.id === 'duy').length} Leader + {personnelList.length - personnelList.filter(p => p.id === 'an').length - personnelList.filter(p => p.id === 'duy').length} Chuyên viên
+                    {displayPersonnelList.filter(p => p.id === 'an').length} Manager + {displayPersonnelList.filter(p => p.id === 'duy').length} Leader + {displayPersonnelList.length - displayPersonnelList.filter(p => p.id === 'an').length - displayPersonnelList.filter(p => p.id === 'duy').length} Chuyên viên
                   </p>
                 </div>
                 <div className="h-11 w-11 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100">
@@ -520,15 +550,16 @@ export default function App() {
               </div>
             </>
           )}
+          </div>
         </div>
 
         {/* Primary Dashboard Navigation Tabs */}
-        <div className="flex border-b border-slate-200 overflow-x-auto gap-2">
+        <div className="hidden sm:flex border-b border-slate-200 overflow-x-auto gap-2">
           <button
             onClick={() => setActiveTab('overview')}
             className={`px-4 py-3 text-xs font-semibold whitespace-nowrap transition-all border-b-2 cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'overview'
-                ? 'border-blue-600 text-blue-600 bg-blue-50/50'
+                ? 'border-amber-600 text-amber-800 bg-amber-50/40'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -539,7 +570,7 @@ export default function App() {
             onClick={() => setActiveTab('tasks')}
             className={`px-4 py-3 text-xs font-semibold whitespace-nowrap transition-all border-b-2 cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'tasks'
-                ? 'border-blue-600 text-blue-600 bg-blue-50/50'
+                ? 'border-amber-600 text-amber-800 bg-amber-50/40'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -550,7 +581,7 @@ export default function App() {
             onClick={() => setActiveTab('kpis')}
             className={`px-4 py-3 text-xs font-semibold whitespace-nowrap transition-all border-b-2 cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'kpis'
-                ? 'border-blue-600 text-blue-600 bg-blue-50/50'
+                ? 'border-amber-600 text-amber-800 bg-amber-50/40'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -561,7 +592,7 @@ export default function App() {
             onClick={() => setActiveTab('ai')}
             className={`px-4 py-3 text-xs font-semibold whitespace-nowrap transition-all border-b-2 cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'ai'
-                ? 'border-blue-600 text-blue-600 bg-blue-50/50'
+                ? 'border-amber-600 text-amber-800 bg-amber-50/40'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -572,7 +603,7 @@ export default function App() {
             onClick={() => setActiveTab('schedule')}
             className={`px-4 py-3 text-xs font-semibold whitespace-nowrap transition-all border-b-2 cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'schedule'
-                ? 'border-blue-600 text-blue-600 bg-blue-50/50'
+                ? 'border-amber-600 text-amber-800 bg-amber-50/40'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -583,7 +614,7 @@ export default function App() {
             onClick={() => setActiveTab('reports')}
             className={`px-4 py-3 text-xs font-semibold whitespace-nowrap transition-all border-b-2 cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'reports'
-                ? 'border-blue-600 text-blue-600 bg-blue-50/50'
+                ? 'border-amber-600 text-amber-800 bg-amber-50/40'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -598,7 +629,7 @@ export default function App() {
             <div className="flex items-center gap-3">
               <img src={selectedMember.avatar} alt={selectedMember.name} className="w-10 h-10 rounded-full object-cover border border-slate-200" />
               <div>
-                <span className="text-[10px] uppercase font-bold text-blue-600 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded">{selectedMember.tag}</span>
+                <span className="text-[10px] uppercase font-bold text-amber-800 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded">{selectedMember.tag}</span>
                 <h4 className="text-sm font-semibold text-slate-800 flex items-center gap-1.5 mt-0.5">
                   Đang thao tác: {selectedMember.name} 
                   <span className="text-xs text-slate-500 font-normal">({selectedMember.role})</span>
@@ -608,15 +639,15 @@ export default function App() {
             
             {/* Quick picker dropdown and Exporter */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-              {currentUser.id === 'an' ? (
+              {isFullAccess ? (
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-slate-500 whitespace-nowrap">Đổi nhân sự:</span>
                   <select
                     value={selectedMemberId}
                     onChange={(e) => setSelectedMemberId(e.target.value)}
-                    className="bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-lg py-1.5 px-3 focus:outline-none focus:ring-1 focus:ring-blue-500 w-full sm:w-auto cursor-pointer"
+                    className="bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-lg py-1.5 px-3 focus:outline-none focus:ring-1 focus:ring-amber-500 w-full sm:w-auto cursor-pointer"
                   >
-                    {personnelList.map(p => (
+                    {displayPersonnelList.map(p => (
                       <option key={p.id} value={p.id}>{p.name} - {p.role.split(' ')[0]}</option>
                     ))}
                   </select>
@@ -638,17 +669,17 @@ export default function App() {
               <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
                 <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
                   <Users className="h-5 w-5 text-blue-600" />
-                  Sơ đồ cơ cấu & Nhiệm vụ nhóm Media ({currentUser.id === 'an' ? personnelList.length : 1} nhân sự)
+                  Sơ đồ cơ cấu & Nhiệm vụ Team Marketing ({isFullAccess ? displayPersonnelList.length : 1} nhân sự)
                 </h2>
                 <p className="text-xs text-slate-500 mt-1 max-w-4xl">
-                  {currentUser.id === 'an' 
+                  {isFullAccess 
                     ? 'Hãy nhấp vào bất kỳ thẻ nhân sự nào để xem chi tiết, tích chọn tiến độ hàng ngày, mô phỏng bảng lương, hoặc kích hoạt trợ lý AI tạo kịch bản, ý tưởng seeding chuyên biệt.'
                     : 'Xem hồ sơ nhiệm vụ, thang lương cơ bản và bảng tính chỉ số KPIs bảo mật của riêng bạn.'
                   }
                 </p>
               </div>
               <TeamOverview 
-                personnelList={currentUser.id === 'an' ? personnelList : personnelList.filter(p => p.id === currentUser.id)} 
+                personnelList={isFullAccess ? displayPersonnelList : displayPersonnelList.filter(p => p.id === currentUser.id)} 
                 onSelectMember={(id) => { setSelectedMemberId(id); setActiveTab('tasks'); }} 
                 selectedMemberId={selectedMemberId}
               />
@@ -673,22 +704,22 @@ export default function App() {
 
           {activeTab === 'ai' && (
             <ContentGenerator 
-              personnelList={personnelList}
+              personnelList={displayPersonnelList}
               selectedMember={selectedMember}
             />
           )}
 
           {activeTab === 'schedule' && (
             <TimelineSchedule 
-              personnelList={currentUser.id === 'an' ? personnelList : personnelList.filter(p => p.id === currentUser.id)}
+              personnelList={isFullAccess ? displayPersonnelList : displayPersonnelList.filter(p => p.id === currentUser.id)}
               selectedMemberId={selectedMemberId}
-              onSelectMember={(id) => currentUser.id === 'an' ? setSelectedMemberId(id) : null}
+              onSelectMember={(id) => isFullAccess ? setSelectedMemberId(id) : null}
             />
           )}
 
           {activeTab === 'reports' && (
             <ReportCompiler 
-              personnelList={currentUser.id === 'an' ? personnelList : personnelList.filter(p => p.id === currentUser.id)} 
+              personnelList={isFullAccess ? displayPersonnelList : displayPersonnelList.filter(p => p.id === currentUser.id)} 
             />
           )}
         </div>
@@ -732,6 +763,64 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Modern Sticky Bottom Tab Bar for Mobile Devices */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200/80 shadow-[0_-4px_12px_rgba(15,23,42,0.06)] z-50 flex items-center justify-around px-2 py-2 pb-safe">
+        <button
+          onClick={() => setActiveTab('overview')}
+          className={`flex flex-col items-center gap-1 flex-1 py-1 px-1 transition-all cursor-pointer ${
+            activeTab === 'overview' ? 'text-amber-700 font-bold' : 'text-slate-400'
+          }`}
+        >
+          <Users className={`h-5 w-5 transition-transform ${activeTab === 'overview' ? 'scale-110 text-amber-600' : ''}`} />
+          <span className="text-[9px] font-semibold tracking-tight">Hồ sơ</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('tasks')}
+          className={`flex flex-col items-center gap-1 flex-1 py-1 px-1 transition-all cursor-pointer ${
+            activeTab === 'tasks' ? 'text-amber-700 font-bold' : 'text-slate-400'
+          }`}
+        >
+          <CheckSquare className={`h-5 w-5 transition-transform ${activeTab === 'tasks' ? 'scale-110 text-amber-600' : ''}`} />
+          <span className="text-[9px] font-semibold tracking-tight">Nhiệm vụ</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('kpis')}
+          className={`flex flex-col items-center gap-1 flex-1 py-1 px-1 transition-all cursor-pointer ${
+            activeTab === 'kpis' ? 'text-amber-700 font-bold' : 'text-slate-400'
+          }`}
+        >
+          <Award className={`h-5 w-5 transition-transform ${activeTab === 'kpis' ? 'scale-110 text-amber-600' : ''}`} />
+          <span className="text-[9px] font-semibold tracking-tight">KPI & Lương</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('ai')}
+          className={`flex flex-col items-center gap-1 flex-1 py-1 px-1 transition-all cursor-pointer ${
+            activeTab === 'ai' ? 'text-amber-700 font-bold' : 'text-slate-400'
+          }`}
+        >
+          <Sparkles className={`h-5 w-5 transition-transform ${activeTab === 'ai' ? 'scale-110 text-amber-600' : ''}`} />
+          <span className="text-[9px] font-semibold tracking-tight">AI Ý tưởng</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('schedule')}
+          className={`flex flex-col items-center gap-1 flex-1 py-1 px-1 transition-all cursor-pointer ${
+            activeTab === 'schedule' ? 'text-amber-700 font-bold' : 'text-slate-400'
+          }`}
+        >
+          <Clock className={`h-5 w-5 transition-transform ${activeTab === 'schedule' ? 'scale-110 text-amber-600' : ''}`} />
+          <span className="text-[9px] font-semibold tracking-tight">Lịch trình</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('reports')}
+          className={`flex flex-col items-center gap-1 flex-1 py-1 px-1 transition-all cursor-pointer ${
+            activeTab === 'reports' ? 'text-amber-700 font-bold' : 'text-slate-400'
+          }`}
+        >
+          <ClipboardList className={`h-5 w-5 transition-transform ${activeTab === 'reports' ? 'scale-110 text-amber-600' : ''}`} />
+          <span className="text-[9px] font-semibold tracking-tight">Báo cáo</span>
+        </button>
+      </div>
     </div>
   );
 }

@@ -117,7 +117,7 @@ export default function ReportCompiler({ personnelList }: ReportCompilerProps) {
     
     if (filterTab === 'daily') {
       report += `==================================================\n`;
-      report += `    BÁO CÁO TIẾN ĐỘ HÀNG NGÀY - NHÓM MEDIA\n`;
+      report += `    BÁO CÁO TIẾN ĐỘ HÀNG NGÀY - TEAM MARKETING\n`;
       report += `==================================================\n`;
       report += `Ngày báo cáo: ${currentDate}\n`;
       report += `Người lập báo cáo: Lê Thanh Duy (Team Leader)\n`;
@@ -170,7 +170,7 @@ export default function ReportCompiler({ personnelList }: ReportCompilerProps) {
       
     } else if (filterTab === 'weekly') {
       report += `==================================================\n`;
-      report += `    BÁO CÁO CÔNG VIỆC ĐỊNH KỲ HÀNG TUẦN - NHÓM MEDIA\n`;
+      report += `    BÁO CÁO CÔNG VIỆC ĐỊNH KỲ HÀNG TUẦN - TEAM MARKETING\n`;
       report += `==================================================\n`;
       report += `Tuần báo cáo: Tuần này (${currentDate})\n`;
       report += `Người lập báo cáo: Lê Thanh Duy (Team Leader)\n`;
@@ -223,7 +223,7 @@ export default function ReportCompiler({ personnelList }: ReportCompilerProps) {
     } else {
       // ALL CONSOLIDATED
       report += `==================================================\n`;
-      report += ` BÁO CÁO TỔNG HỢP (HÀNG NGÀY & ĐỊNH KỲ TUẦN) - NHÓM MEDIA\n`;
+      report += ` BÁO CÁO TỔNG HỢP (HÀNG NGÀY & ĐỊNH KỲ TUẦN) - TEAM MARKETING\n`;
       report += `==================================================\n`;
       report += `Ngày lập báo cáo: ${currentDate}\n`;
       report += `Người lập báo cáo: Lê Thanh Duy (Team Leader)\n`;

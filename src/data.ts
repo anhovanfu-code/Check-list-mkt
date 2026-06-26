@@ -36,7 +36,7 @@ export const initialPersonnelData: Personnel[] = [
       { id: 'an_kpi_uptime', name: 'Độ ổn định hệ thống IT & Server', target: 'Uptime > 99.9%', weight: 15, unit: '%', currentValue: 99.8, targetValue: 99.9 },
       { id: 'an_kpi_kiotviet', name: 'Độ chính xác đồng bộ KiotViet', target: 'Sai lệch 0%', weight: 15, unit: '%', currentValue: 100, targetValue: 100 },
       { id: 'an_kpi_ai', name: 'Hiệu quả triển khai hệ thống AI & Tooling', target: 'Đạt 100% KPI tự động hóa', weight: 20, unit: '%', currentValue: 95, targetValue: 100 },
-      { id: 'an_kpi_revenue', name: 'Doanh thu Tổng Công ty Cam kết (KiotViet)', target: '1.5 Tỷ VND / Tháng', weight: 30, unit: 'VND', currentValue: 1350000000, targetValue: 1500000000 }
+      { id: 'an_kpi_revenue', name: 'Doanh thu Tổng Công ty Cam kết (KiotViet)', target: '10 Tỷ VND / Tháng', weight: 30, unit: 'VND', currentValue: 10000000000, targetValue: 10000000000 }
     ]
   },
   {
@@ -272,5 +272,24 @@ export const initialPersonnelData: Personnel[] = [
       { id: 'nhan_kpi_3', name: 'Hiệu quả tối ưu hóa ads (CPL)', target: '< 160,000 VND', weight: 20, unit: 'VND', currentValue: 145000, targetValue: 160000 },
       { id: 'nhan_kpi_4', name: 'Thời gian giải quyết sự cố IT', target: '< 1 giờ', weight: 20, unit: 'Giờ', currentValue: 0.8, targetValue: 1 }
     ]
+  },
+  {
+    id: 'thinh',
+    name: 'Đào Thị Như Thịnh',
+    role: 'Nhân sự Công ty (Giám sát phòng Marketing)',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
+    tag: 'Giám sát / Monitor',
+    baseSalaryMin: 0,
+    baseSalaryMax: 0,
+    estimatedTotalMin: 0,
+    estimatedTotalMax: 0,
+    mainScope: 'Tài khoản nhân sự công ty được ủy quyền đăng nhập để theo dõi, giám sát tiến trình, lịch trình công việc và chỉ số hiệu suất (KPIs) của phòng Marketing.',
+    subScope: 'Hệ thống tự động phân quyền Chỉ Xem (View-only) đối với toàn bộ dữ liệu, bảng lương giả định và tiến độ nhiệm vụ.',
+    supportScope: 'Mọi ý kiến đóng góp hoặc phản hồi chuyên môn vui lòng trao đổi trực tiếp với Trưởng phòng Hồ Văn An.',
+    email: 'thinh.dtn@fugalo.vn',
+    phone: '0938690664',
+    code: '[COMPANY-SUPERVISOR]',
+    tasks: [],
+    kpis: []
   }
 ];

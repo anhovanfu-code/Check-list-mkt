@@ -155,7 +155,7 @@ export default function DossierExporter({ member, variant = 'full' }: DossierExp
     md += `3. **Chống Checkpoint:** Sử dụng Proxy tĩnh IP sạch đối với hệ thống Seeding và tương tác hàng loạt.\n`;
     md += `4. **Kiểm duyệt rủi ro:** Rà soát từ khóa cấm, bản quyền nhạc và tuân thủ chính sách nền tảng trước khi đăng tải.\n\n`;
     md += `------------------------------------------------------------------------\n`;
-    md += `*Báo cáo được trích xuất tự động từ Hệ thống Quản trị Media Fugalo*`;
+    md += `*Báo cáo được trích xuất tự động từ Hệ thống Quản trị Công việc Team Marketing*`;
     return md;
   };
 
@@ -518,7 +518,7 @@ export default function DossierExporter({ member, variant = 'full' }: DossierExp
         </div>
 
         <div class="footer-note">
-            Báo cáo Hồ sơ năng lực được kết xuất tự động từ hệ thống quản trị nhóm Media Fugalo.<br>
+            Báo cáo Hồ sơ năng lực được kết xuất tự động từ Hệ thống Quản trị Công việc Team Marketing.<br>
             Ngày kết xuất: ${new Date().toLocaleDateString('vi-VN')} | Đăng ký tài khoản: ${member.email || 'Hệ thống'}
         </div>
     </div>

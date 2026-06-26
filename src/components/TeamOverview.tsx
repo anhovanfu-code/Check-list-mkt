@@ -12,6 +12,7 @@ interface TeamOverviewProps {
 export default function TeamOverview({ personnelList, onSelectMember, selectedMemberId }: TeamOverviewProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterTag, setFilterTag] = useState('All');
+  const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
 
   const tags = ['All', 'Quản lý Marketing', 'Media & Quảng cáo', 'Content - Đồ cổ', 'Content - Hàng hiệu', 'Live & Seeding', 'Điều phối Media', 'Cameraman & Editor', 'Trưởng nhóm Media', 'Seeding & Ads kiêm IT'];
 
@@ -115,9 +116,41 @@ export default function TeamOverview({ personnelList, onSelectMember, selectedMe
                 </div>
 
                 {/* Scope Preview */}
-                <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                  {person.mainScope}
-                </p>
+                <div className="space-y-2 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                  <div className="text-xs text-slate-600 leading-relaxed">
+                    <span className="font-bold text-slate-700">Nhiệm vụ chính: </span>
+                    <span className={expandedCardId === person.id ? "" : "line-clamp-2"}>
+                      {person.mainScope}
+                    </span>
+                  </div>
+
+                  {expandedCardId === person.id && (
+                    <div className="pt-2 border-t border-slate-200/60 space-y-2 text-xs text-slate-600 animate-in fade-in slide-in-from-top-1 duration-200">
+                      {person.subScope && (
+                        <div>
+                          <span className="font-bold text-slate-700">Mảng bổ trợ: </span>
+                          <span>{person.subScope}</span>
+                        </div>
+                      )}
+                      {person.supportScope && (
+                        <div>
+                          <span className="font-bold text-slate-700">Tối ưu / Công cụ AI: </span>
+                          <span>{person.supportScope}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setExpandedCardId(expandedCardId === person.id ? null : person.id);
+                    }}
+                    className="text-[10px] font-bold text-blue-600 hover:text-blue-700 transition flex items-center gap-1 cursor-pointer pt-0.5"
+                  >
+                    {expandedCardId === person.id ? "Thu gọn nội dung ▲" : "Xem đầy đủ nhiệm vụ ▼"}
+                  </button>
+                </div>
 
                 {/* Contact Info */}
                 {(person.email || person.phone) && (
