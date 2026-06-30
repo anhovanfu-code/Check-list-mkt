@@ -14,7 +14,7 @@ export const initialPersonnelData: Personnel[] = [
     mainScope: 'Hoạch định chiến lược Marketing, trực tiếp thiết kế giải pháp AI, lập trình phần mềm và thiết lập kiến trúc bảo mật tài sản số (tài khoản doanh nghiệp, Fanpage, Business Manager).',
     subScope: 'Vận hành hạ tầng IT, quản trị Server, đồng bộ API KiotViet và bảo vệ hệ thống tài khoản tránh bị checkpoint/hack.',
     supportScope: 'Tự động hóa quy trình sản xuất của toàn bộ Media Team bằng AI (Auto-subtitle, Auto-seeding, AI-agent kịch bản).',
-    email: 'anhovan.fu@gmail.com',
+    email: 'an.hv@fugalo.vn',
     phone: '0939 81 00 86',
     code: '[TP.MKT-kiem-TechLead]',
     tasks: [

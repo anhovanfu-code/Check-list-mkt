@@ -3,6 +3,7 @@ import { Personnel } from '../types';
 import { ShieldCheck, Mail, AlertCircle, ChevronRight, HelpCircle, ExternalLink } from 'lucide-react';
 import { signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase';
+import { initialPersonnelData } from '../data';
 
 interface LoginProps {
   personnelList: Personnel[];
@@ -40,10 +41,35 @@ export default function Login({ personnelList, onLoginSuccess }: LoginProps) {
         throw new Error('Không thể lấy địa chỉ email từ tài khoản Google của bạn.');
       }
 
-      const googleEmail = user.email.toLowerCase();
+      const googleEmail = user.email.trim().toLowerCase();
+      
+      // Use active list if available, otherwise fall back to static initial data
+      const activeList = personnelList && personnelList.length > 0 ? personnelList : initialPersonnelData;
       
       // Match with authorized media roster
-      const matchedUser = personnelList.find(p => p.email?.toLowerCase() === googleEmail);
+      let matchedUser = activeList.find(p => {
+        const pEmail = p.email?.trim().toLowerCase();
+        const gEmail = googleEmail;
+        if (p.id === 'an' && (gEmail === 'an.hv@fugalo.vn' || gEmail === 'anhovan.fu@gmail.com')) {
+          return true;
+        }
+        if (p.id === 'thinh' && gEmail === 'thinh.dtn@fugalo.vn') {
+          return true;
+        }
+        return pEmail === gEmail;
+      });
+
+      // Special fallback guarantee for key personnel if active list has stale cache
+      if (!matchedUser) {
+        if (googleEmail === 'an.hv@fugalo.vn' || googleEmail === 'anhovan.fu@gmail.com') {
+          matchedUser = activeList.find(p => p.id === 'an') || initialPersonnelData.find(p => p.id === 'an');
+        } else if (googleEmail === 'thinh.dtn@fugalo.vn') {
+          matchedUser = activeList.find(p => p.id === 'thinh') || initialPersonnelData.find(p => p.id === 'thinh');
+        } else {
+          // General search in the fallback initialPersonnelData just in case
+          matchedUser = initialPersonnelData.find(p => p.email?.trim().toLowerCase() === googleEmail);
+        }
+      }
 
       if (!matchedUser) {
         setError(`Email Google [ ${googleEmail} ] chưa được cấp quyền truy cập hệ thống. Vui lòng liên hệ Trưởng phòng Hồ Văn An.`);
